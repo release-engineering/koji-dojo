@@ -8,6 +8,8 @@ ENV POSTGRES_PASSWORD 'mypassword'
 RUN apt-get update -y
 RUN apt-get install -y apt-utils git patch
 
+ADD sql/ /docker-entrypoint-initdb.d/
+
 # TODO: Enable different versions of Koji instead of the master branch
 RUN git clone https://git.fedorahosted.org/git/koji /opt/koji
 
