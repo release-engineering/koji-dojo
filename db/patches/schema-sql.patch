@@ -104,3 +104,4 @@ index d8ce975..aacaee2 100644
 +DROP FUNCTION IF EXISTS get_event_time(INTEGER);
  
  BEGIN WORK;
+ 
