@@ -5,7 +5,7 @@ MAINTAINER John Casey <jcasey@redhat.com>
 RUN sed -i '/nodocs/d' /etc/yum.conf
 
 RUN yum -y update
-RUN yum -y install lsof python-simplejson openssh-server
+RUN yum -y install lsof python-simplejson openssh-server openssh-clients
 
 ADD bin/ /usr/local/bin/
 
