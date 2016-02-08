@@ -44,3 +44,15 @@ chown -R nobody:nobody /opt/koji-clients
 chmod -R o+rx /var/log
 chmod -R g+rs /var/log
 chgrp -R nobody /var/log
+
+mkdir /root/.koji
+
+cat <<EOF >> /root/.koji/config
+[koji]
+server = https://localhost/kojihub
+authtype = ssl
+cert = /opt/koji-clients/kojiadmin/client.crt
+ca = /opt/koji-clients/kojiadmin/clientca.crt
+serverca = /opt/koji-clients/kojiadmin/serverca.crt
+EOF
+

@@ -7,7 +7,7 @@ RUN sed -i '/nodocs/d' /etc/yum.conf
 VOLUME ["/opt/koji-clients", "/opt/koji"]
 
 RUN yum -y update
-RUN yum -y install git yum-utils tar bzip2 rpm-build make patch httpd mod_wsgi mod_ssl lsof python-simplejson PyGreSQL pyOpenSSL python-krbV python-qpid python-saslwrapper saslwrapper postgresql
+RUN yum -y install git yum-utils tar bzip2 rpm-build make patch httpd mod_wsgi mod_ssl lsof python-simplejson PyGreSQL pyOpenSSL python-krbV python-qpid python-saslwrapper saslwrapper postgresql sudo
 
 ADD etc/ /etc/
 ADD bin/ /usr/local/bin/

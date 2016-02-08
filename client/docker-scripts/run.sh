@@ -15,7 +15,7 @@ while true; do
 	sleep 5
 done
 
-docker run -ti --rm --name=koji-client --volumes-from koji-hub docker.io/buildchimp/koji-client-dojo
+docker run -ti --rm --name=koji-client --volumes-from koji-hub docker.io/buildchimp/koji-dojo-client
 
 docker stop koji-hub koji-db
 docker rm koji-hub koji-db
