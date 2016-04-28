@@ -1,0 +1,23 @@
+
+koji-db:
+    image: "postgres:9.4"
+    environment:
+        - POSTGRES_DB=koji
+        - POSTGRES_USER=koji
+        - POSTGRES_PASSWORD=mypassword
+
+koji-hub:
+    image: "docker.io/buildchimp/koji-dojo-hub"
+    volumes:
+        - /opt/koji:/opt/koji:rw
+        - /opt/koji-clients:/opt/koji-clients:rw
+    links:
+        - koji-db
+
+koji-client:
+    image: "docker.io/buildchimp/koji-dojo-client"
+    volumes_from:
+        - koji-hub:rw
+    links:
+        - koji-hub
+

@@ -2,8 +2,9 @@
 
 set -x
 
-# TODO: Enable different versions of Koji instead of the master branch
-git clone https://git.fedorahosted.org/git/koji /opt/koji
+if [ ! -d "/opt/koji/.git" ]; then
+    git clone https://git.fedorahosted.org/git/koji /opt/koji
+fi
 
 cd /opt/koji
 make test-rpm
