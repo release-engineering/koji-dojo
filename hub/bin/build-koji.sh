@@ -7,9 +7,11 @@ if [ ! -d "/opt/koji/.git" ]; then
 fi
 
 cd /opt/koji
+# Remove previous build to avoid multilib errors.
+rm -rf noarch
 make test-rpm
 
-yum -y localinstall noarch/koji-hub*.rpm noarch/koji-1.*.rpm
+yum -y localinstall noarch/koji-hub*.rpm noarch/koji-1.*.rpm noarch/koji-web*.rpm
 
 psql="psql --host=koji-db --username=koji koji"
 

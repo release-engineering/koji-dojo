@@ -31,17 +31,17 @@ user=$1
 password="mypassword"
 conf=confs/${user}-ssl.cnf
 
-openssl genrsa -out private/${user}.key 2048 
+openssl genrsa -out private/${user}.key 2048
 cp ssl.cnf $conf
 
 openssl req -config $conf -new -nodes -out certs/${user}.csr -key private/${user}.key \
-            -subj "/C=US/ST=Drunken/L=Bed/O=IT/CN=${user}/emailAddress=${user}@kojihub.local" 
+            -subj "/C=US/ST=Drunken/L=Bed/O=IT/CN=${user}/emailAddress=${user}@kojihub.local"
 
 openssl ca -config $conf -batch -keyfile private/${caname}_ca_cert.key -cert ${caname}_ca_cert.crt \
 		   -out certs/${user}-crtonly.crt -outdir certs -infiles certs/${user}.csr
 
 openssl pkcs12 -export -inkey private/${user}.key -passout "pass:${password}" -in certs/${user}-crtonly.crt -CAfile ${caname}_ca_cert.crt \
-			   -out certs/${user}_browser_cert.p12 
+			   -out certs/${user}_browser_cert.p12
 
 openssl pkcs12 -clcerts -passin "pass:${password}" -passout "pass:${password}" -in certs/${user}_browser_cert.p12 -inkey private/${user}.key -out certs/${user}.pem
 
@@ -52,7 +52,7 @@ client=/opt/koji-clients/${user}
 mkdir -p $client
 cp /etc/pki/koji/certs/${user}.crt $client/client.crt   # NOTE: It is IMPORTANT you use the aggregated form
 cp /etc/pki/koji/certs/${user}.pem $client/client.pem
-cp /etc/pki/koji/${user}_browser_cert.p12 $client/client_browser_cert.p12
+cp /etc/pki/koji/certs/${user}_browser_cert.p12 $client/client_browser_cert.p12
 cp /etc/pki/koji/koji_ca_cert.crt $client/clientca.crt
 cp /etc/pki/koji/koji_ca_cert.crt $client/serverca.crt
 

@@ -1,6 +1,7 @@
 
 koji-db:
     image: "postgres:9.4"
+    hostname: koji-db
     environment:
         - POSTGRES_DB=koji
         - POSTGRES_USER=koji
@@ -8,6 +9,7 @@ koji-db:
 
 koji-hub:
     image: "docker.io/buildchimp/koji-dojo-hub"
+    hostname: koji-hub
     volumes:
         - /opt/koji:/opt/koji:rw
         - /opt/koji-clients:/opt/koji-clients:rw
@@ -16,6 +18,7 @@ koji-hub:
 
 koji-client:
     image: "docker.io/buildchimp/koji-dojo-client"
+    hostname: koji-client
     volumes_from:
         - koji-hub:rw
     links:
