@@ -1,5 +1,16 @@
 #!/bin/bash
 
+while true; do
+	echo "Waiting for koji-hub to start..."
+    hubstart=$(curl -X GET http://koji-hub/)
+	echo $hubstart
+	if [ "x$hubstart" != "x" ]; then
+		echo "koji-hub started:"
+	    break
+	fi
+	sleep 5
+done
+
 set -x
 
 if [ -d /opt/koji/noarch ]; then

@@ -2,19 +2,16 @@
 
 set -x
 
-if [ ! -d /opt/koji ]; then
-	# TODO: Enable different versions of Koji instead of the master branch
-	git clone https://git.fedorahosted.org/git/koji /opt/koji
+if [ ! -d "/opt/koji/.git" ]; then
+    git clone https://git.fedorahosted.org/git/koji /opt/koji
 fi
 
 cd /opt/koji
-
-make clean
-rm -rf noarch koji-*
-
+# Remove previous build to avoid multilib errors.
+rm -rf noarch
 make test-rpm
 
-yum -y localinstall noarch/koji-hub*.rpm noarch/koji-1.*.rpm
+yum -y localinstall noarch/koji-hub*.rpm noarch/koji-1.*.rpm noarch/koji-web*.rpm
 
 echo "Sleep 10s in case database container is still booting..."
 sleep 10

@@ -4,8 +4,13 @@ MAINTAINER John Casey <jcasey@redhat.com>
 #RUN sed -i '/excludedocs/d' /etc/rpm/macros.imgcreate
 RUN sed -i '/nodocs/d' /etc/yum.conf
 
-RUN yum -y update
-RUN yum -y install lsof python-simplejson openssh-server openssh-clients
+RUN yum -y update && \
+    yum -y install \
+        lsof \
+        python-simplejson \
+        openssh-server \
+        openssh-clients \
+    ; yum clean all
 
 ADD bin/ /usr/local/bin/
 

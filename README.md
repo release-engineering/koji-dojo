@@ -17,6 +17,15 @@ Currently, there are only two images:
 * `*/docker-scripts/start.sh` - Starts supporting container and a new container for the given image. Each container is started in daemon mode.
 * `*/docker-scripts/stop.sh` - Stops and removes the container for the given image and any supporting containers.
 
+## Docker Compose
+
+* Build all images: `build-all.sh`
+* Start all containers: `docker-compose up` (Use -d for detached mode)
+* Stop and remove all containers: `docker-compose down`
+
+* koji-hub's IP address must be added to local /etc/hosts such as:
+    `172.17.0.3   koji-hub`
+
 ## Hub Image Notes
 
 When the hub initializes, it checks out Koji sources from Git, builds them, and installs the koji-hub* RPMs. The sources are cloned into `/opt/koji`, which is exposed as a Docker volume. This enables the `client` image to install the client RPM that was built in conjunction with the hub RPMs.

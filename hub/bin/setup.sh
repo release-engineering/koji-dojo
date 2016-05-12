@@ -29,13 +29,14 @@ conf=confs/ca.cnf
 
 cat ssl.cnf | sed "s/email\:copy/${CA_SAN}/"> $conf
 
-openssl req -config $conf -new -x509 -subj "/C=US/ST=Drunken/L=Bed/O=IT/CN=kojihub.local" -days 3650 -key private/koji_ca_cert.key -out koji_ca_cert.crt -extensions v3_ca
+openssl req -config $conf -new -x509 -subj "/C=US/ST=Drunken/L=Bed/O=IT/CN=koji-hub" -days 3650 -key private/koji_ca_cert.key -out koji_ca_cert.crt -extensions v3_ca
 
 cp private/koji_ca_cert.key private/kojihub.key
 cp koji_ca_cert.crt certs/kojihub.crt
 
 rm -rf /koji-clients/*
 
+mkuser.sh kojiweb admin
 mkuser.sh kojiadmin admin
 mkuser.sh testadmin admin
 mkuser.sh testuser
