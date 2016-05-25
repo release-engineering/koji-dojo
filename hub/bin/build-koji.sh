@@ -3,7 +3,7 @@
 set -x
 
 if [ ! -d "/opt/koji/.git" ]; then
-    git clone https://git.fedorahosted.org/git/koji /opt/koji
+    git clone https://pagure.io/koji.git /opt/koji
 fi
 
 cd /opt/koji

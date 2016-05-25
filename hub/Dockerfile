@@ -28,6 +28,11 @@ RUN yum -y update && \
         saslwrapper \
         postgresql \
         sudo \
+        mod_auth_kerb \
+        python-cheetah \
+        python-markdown \
+        python-pygments \
+        python-setuptools \
     ; yum clean all
 
 ADD etc/ /etc/
