@@ -19,7 +19,7 @@ Currently, there are only two images:
 
 ## Docker Compose
 
-* Build all images: `build-all.sh`
+* Build all images: `docker-compose build`
 * Start all containers: `docker-compose up` (Use -d for detached mode)
 * Stop and remove all containers: `docker-compose down`
 
@@ -57,3 +57,15 @@ koji -c /opt/koji-clients/testuser/config hello
 The client container mounts all exposed volumes from the hub. During initialization, it installs the Koji client RPM in `/opt/koji/noarch` (built by the hub during its own initialization), then uses the SSL configurations under `/opt/koji-clients` to generate `/root/.koji/config` with headings like `koji-testuser`. Next it symlinks `/usr/local/koji` to corresponding script names (eg. `koji-testuser`) under `/root/bin`.
 
 Finally, the client container sets up SSH host keys and starts the SSHd daemon. It prints the IP address and port for this SSHd instance to the docker log.
+
+## Web Browser Certificates
+
+Certificates for the various accounts created during hub container
+initialization can be found at `/opt/koji-clients`.
+
+Install the corresponding cert in your browser to enable logins.
+In Chrome, for example, this can be done via UI or via the command line
+by using pk12util:
+
+`pk12util -d sql:$HOME/.pki/nssdb -i /opt/koji-clients/testuser/client_browser_cert.p12 -W mypassword`
+
