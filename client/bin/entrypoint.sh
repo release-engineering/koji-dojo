@@ -16,9 +16,9 @@ set -x
 if [ -d /opt/koji/noarch ]; then
 	yum -y localinstall /opt/koji/noarch/koji-1*.rpm
 else
-	echo "No koji RPM to install!"
-	echo "(TODO: install from EPEL)"
-	exit 1
+	echo "No koji RPM to install! Installing from EPEL"
+	yum -y install epel-release
+  yum -y install koji
 fi
 
 mkdir /root/{.koji,bin}
