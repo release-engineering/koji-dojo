@@ -33,6 +33,7 @@ RUN yum -y update && \
         python-markdown \
         python-pygments \
         python-setuptools \
+        python-sphinx \
     ; yum clean all
 
 ADD etc/ /etc/
