@@ -34,6 +34,7 @@ RUN yum -y update && \
         python-pygments \
         python-setuptools \
         python-sphinx \
+        openssh-server \
     ; yum clean all
 
 ADD etc/ /etc/
@@ -51,7 +52,8 @@ RUN chmod -R o+rx /etc/httpd
 
 RUN mkdir -p /mnt/koji/{packages,repos,work,scratch}
 RUN chown apache.apache /mnt/koji/*
+RUN echo 'root:mypassword' | chpasswd
 
-EXPOSE 80 443
+EXPOSE 22 80 443
 
 ENTRYPOINT /usr/local/bin/entrypoint.sh
