@@ -34,7 +34,9 @@ RUN yum -y update && \
         python-pygments \
         python-setuptools \
         python-sphinx \
+        python-coverage \
         openssh-server \
+        wget \
     ; yum clean all
 
 ADD etc/ /etc/
