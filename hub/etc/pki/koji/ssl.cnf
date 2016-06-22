@@ -67,10 +67,10 @@ basicConstraints                = CA:FALSE
 nsComment                       = "OpenSSL Generated Certificate"
 subjectKeyIdentifier            = hash
 authorityKeyIdentifier          = keyid,issuer:always
-subjectAltName                  = email:copy
+subjectAltName                  = email:move
 
 [v3_ca] 
 subjectKeyIdentifier            = hash
 authorityKeyIdentifier          = keyid:always,issuer:always
 basicConstraints                = CA:true
-subjectAltName                  = email:copy
+subjectAltName                  = email:move

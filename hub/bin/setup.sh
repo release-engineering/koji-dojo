@@ -35,13 +35,10 @@ generate_ssl_certificates() {
 	echo 01 > serial
 
 	# CA
-	openssl genrsa -out private/koji_ca_cert.key 2048
-
-	CA_SAN="IP.1:${IP},DNS.1:localhost,DNS.2:${IP}"
 	conf=confs/ca.cnf
+	cp ssl.cnf $conf
 
-	cat ssl.cnf | sed "s/email\:copy/${CA_SAN}/"> $conf
-
+	openssl genrsa -out private/koji_ca_cert.key 2048
 	openssl req -config $conf -new -x509 -subj "/C=US/ST=Drunken/L=Bed/O=IT/CN=koji-hub" -days 3650 -key private/koji_ca_cert.key -out koji_ca_cert.crt -extensions v3_ca
 
 	cp private/koji_ca_cert.key private/kojihub.key
