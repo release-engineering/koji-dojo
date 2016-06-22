@@ -52,6 +52,11 @@ Now, if you have the Koji client RPM installed locally, you can start using the 
 koji -c /opt/koji-clients/testuser/config hello
 ```
 
+```
+koji -c /opt/koji-clients/testuser/config list-tags
+```
+
+
 ## Client Image Notes
 
 The client container mounts all exposed volumes from the hub. During initialization, it installs the Koji client RPM in `/opt/koji/noarch` (built by the hub during its own initialization), then uses the SSL configurations under `/opt/koji-clients` to generate `/root/.koji/config` with headings like `koji-testuser`. Next it symlinks `/usr/local/koji` to corresponding script names (eg. `koji-testuser`) under `/root/bin`.
