@@ -49,6 +49,7 @@ cat certs/${user}-crtonly.crt private/${user}.key > certs/${user}.crt
 
 client=/opt/koji-clients/${user}
 
+rm -rf $client
 mkdir -p $client
 cp /etc/pki/koji/certs/${user}.crt $client/client.crt   # NOTE: It is IMPORTANT you use the aggregated form
 cp /etc/pki/koji/certs/${user}.pem $client/client.pem

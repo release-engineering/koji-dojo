@@ -44,12 +44,11 @@ generate_ssl_certificates() {
 	cp private/koji_ca_cert.key private/kojihub.key
 	cp koji_ca_cert.crt certs/kojihub.crt
 
-	rm -rf /koji-clients/*
-
 	mkuser.sh kojiweb admin
 	mkuser.sh kojiadmin admin
 	mkuser.sh testadmin admin
 	mkuser.sh testuser
+
 	chown -R nobody:nobody /opt/koji-clients
 }
 
