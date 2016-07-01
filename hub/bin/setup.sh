@@ -6,8 +6,13 @@ create_koji_folders() {
 	echo "Create Koji folders"
 
 	cd /mnt
-	mkdir koji
+	if [ ! -d koji ]
+	then
+	    echo "Creating koji folder"
+	    mkdir koji
+	fi
 	cd koji
+	echo "Creating koji folder structure"
 	mkdir {packages,repos,work,scratch}
 	chown apache.apache *
 }
@@ -67,7 +72,7 @@ serverca = /opt/koji-clients/kojiadmin/serverca.crt
 EOF
 }
 
-if [ -d /mnt/koji ]
+if [ -d /mnt/koji/packages ]
 then
     echo "Koji folders exist"
 else
