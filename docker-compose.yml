@@ -3,7 +3,7 @@ version: '2'
 services:
 
     koji-db:
-        image: "postgres:9.4"
+        build: koji-db
         hostname: koji-db
         environment:
             - POSTGRES_DB=koji
