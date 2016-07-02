@@ -1,26 +1,29 @@
+version: '2'
 
-koji-db:
-    image: "postgres:9.4"
-    hostname: koji-db
-    environment:
-        - POSTGRES_DB=koji
-        - POSTGRES_USER=koji
-        - POSTGRES_PASSWORD=mypassword
+services:
 
-koji-hub:
-    build: hub
-    hostname: koji-hub
-    volumes:
-        - /opt/koji:/opt/koji:rw
-        - /opt/koji-clients:/opt/koji-clients:rw
-    links:
-        - koji-db
+    koji-db:
+        build: koji-db
+        hostname: koji-db
+        environment:
+            - POSTGRES_DB=koji
+            - POSTGRES_USER=koji
+            - POSTGRES_PASSWORD=mypassword
 
-koji-client:
-    build: client
-    hostname: koji-client
-    volumes_from:
-        - koji-hub:rw
-    links:
-        - koji-hub
+    koji-hub:
+        build: hub
+        hostname: koji-hub
+        volumes:
+            - /opt/koji:/opt/koji:rw
+            - /opt/koji-clients:/opt/koji-clients:rw
+        links:
+            - koji-db
+
+    koji-client:
+        build: client
+        hostname: koji-client
+        volumes_from:
+            - koji-hub:rw
+        links:
+            - koji-hub
 
