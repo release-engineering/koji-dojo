@@ -54,6 +54,9 @@ generate_ssl_certificates() {
 	mkuser.sh testadmin admin
 	mkuser.sh testuser
 
+	mkuser.sh kojibuilder builder
+
+
 	chown -R nobody:nobody /opt/koji-clients
 }
 
