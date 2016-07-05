@@ -4,10 +4,11 @@ Koji dojo is a suite of Docker images that are designed to enable automated test
 
 ## Images
 
-Currently, there are only two images:
+Currently, there are three images:
 
 * `hub/` - This is a simplistic build of the Koji hub service, configured to enable SSL authentication. It is based on the CentOS 6 Docker image
 * `client/` - This is a minimal CentOS 6 image that mounts volumes from the hub container and installs the Koji client RPM from it. It will also link and configure scripts for each of the users generated in the hub setup.
+* `builder/` - This is a simplistic build of the Koji builder service connected to hub. It is based on the CentOS 6 Docker image
 
 ## Docker Maintenance Scripts
 
@@ -35,6 +36,10 @@ The Koji hub image generates three users on initialization:
 * kojiadmin
 * testadmin
 * testuser
+
+The Koji hub image generates one host on initialization:
+
+* kojibuilder
 
 The PKCS#12 SSL certificates for these each use the password 'mypassword'. The certificates, CA cert files, and a basic Koji configuration file is stored for each user under `/opt/koji-clients/<user>`. Along with these, a basic JSON file is stored for each user that gives the URL and SSL file references in a way that's easy to use for non-Koji clients. The `/opt/koji-clients` directory is exposed as a volume in the Docker container, so it can be mounted in other containers via the `--volumes-from` Docker run option.
 
@@ -74,3 +79,98 @@ by using pk12util:
 
 `pk12util -d sql:$HOME/.pki/nssdb -i /opt/koji-clients/testuser/client_browser_cert.p12 -W mypassword`
 
+## Builder notes
+
+To use builder please use builder/docker-scripts/build-all.sh to build hub image instead of hub//docker-scripts/build.sh (please see comments inside the script for explanation)
+
+To start koji-db, koji-hub and koji-builder please use builder/docker-scripts/run.sh
+
+Example of builder bootstrap:
+
+~~~~
+# build builder
+./builder/docker-scripts/build.sh
+
+# start builder (includes start of koji-db and koji-hub)
+# please note koji hub will be started using different options tham specified in ./hub/docker-scripts/run.sh
+# because additional volume /opt/koji-files is mapped to be shared with builder
+./builder/docker-scripts/run.sh
+
+# create alias for to allow use local koji installation
+# optionally you can use koji-client container
+alias kojitest="koji -c /opt/koji-clients/kojiadmin/config"
+
+# verify koji is running
+kojitest hello
+
+# show cert info
+pk12util -d sql:$HOME/.pki/nssdb -l /opt/koji-clients/kojiadmin/client_browser_cert.p12 -W mypassword
+# show certificates
+certutil -d sql:$HOME/.pki/nssdb -L
+
+# delete
+certutil -d sql:$HOME/.pki/nssdb -D -n "kojiadmin - IT"
+certutil -d sql:$HOME/.pki/nssdb -D -n "koji-hub - IT"
+
+# import admin certificate
+pk12util -d sql:$HOME/.pki/nssdb -i /opt/koji-clients/kojiadmin/client_browser_cert.p12 -W mypassword
+
+# https://chromium.googlesource.com/chromium/src/+/master/docs/linux_cert_management.md
+
+# open koji-hub in browser and login with certificate
+# hit CTRL+R to reload in case of deleting of existing certificate to login with new one
+google-chrome https://172.17.0.3/koji/login &
+
+# noarch because of maven repo for maven build
+kojitest add-tag destination-tag --maven-support --include-all --arches="noarch"
+
+# arch x86_64 because of rpm repo used to create build environment
+kojitest add-tag build-tag --maven-support --include-all --arches="x86_64"
+
+# create build target
+kojitest add-target build-target build-tag destination-tag
+
+# create build group "maven-build"
+kojitest add-group build-tag maven-build
+
+# populate the "maven-build" group with packages that will be installed into the build environment (buildroot)
+kojitest add-group-pkg build-tag maven-build bash coreutils git java-1.8.0-openjdk-devel maven3 shadow-utils
+
+# add external repo to download rpms into build environment (buildroot)
+kojitest add-external-repo -t build-tag buil-external-repo http://myorg.com/rpm-repo/\$arch/
+# or
+# import packages ...
+
+
+# example of importing external archives
+# resolve imported dependency (all artifacts for given gav)
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:pom
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar -Dclassifier=javadoc
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar -Dclassifier=sources
+
+# import maven artifacts of imported package
+kojitest import-archive --create-build --type maven --type-info ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4.pom org.apache.maven.plugins-maven-enforcer-plugin-1.4-1 ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4.jar ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4-javadoc.jar ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4.pom ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4-sources.jar
+
+# add package
+kojitest add-pkg --owner kojiadmin build-tag org.apache.maven.plugins-maven-enforcer-plugin
+
+# tag package build
+kojitest tag-pkg build-tag org.apache.maven.plugins-maven-enforcer-plugin-1.4-1
+
+
+# make sure followin list is not empty othewise maven repo is not generated
+kojitest list-tagged --inherit build-tag
+
+# repo regen
+kojitest regen-repo build-tag
+
+# verify maven repo was generated - maven repo root should be displayed
+google-chrome https://172.17.0.3/kojifiles/repos/build-tag/latest/maven/ &
+
+# add package
+kojitest add-pkg --owner=kojiadmin destination-tag myproject
+# submit maven build
+kojitest maven-build build-target https://www.github.com/myorg/myproject
+
+~~~~

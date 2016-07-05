@@ -6,8 +6,13 @@ create_koji_folders() {
 	echo "Create Koji folders"
 
 	cd /mnt
-	mkdir koji
+	if [ ! -d koji ]
+	then
+	    echo "Creating koji folder"
+	    mkdir koji
+	fi
 	cd koji
+	echo "Creating koji folder structure"
 	mkdir {packages,repos,work,scratch}
 	chown apache.apache *
 }
@@ -49,6 +54,9 @@ generate_ssl_certificates() {
 	mkuser.sh testadmin admin
 	mkuser.sh testuser
 
+	mkuser.sh kojibuilder builder
+
+
 	chown -R nobody:nobody /opt/koji-clients
 }
 
@@ -67,7 +75,7 @@ serverca = /opt/koji-clients/kojiadmin/serverca.crt
 EOF
 }
 
-if [ -d /mnt/koji ]
+if [ -d /mnt/koji/packages ]
 then
     echo "Koji folders exist"
 else
