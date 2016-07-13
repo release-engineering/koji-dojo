@@ -72,6 +72,8 @@ authtype = ssl
 cert = ${client}/client.crt
 ca = ${client}/clientca.crt
 serverca = ${client}/serverca.crt
+weburl = https://${IP}/koji
+topurl = https://${IP}/kojifiles
 EOF
 
 cat <<EOF > $client/config.json
