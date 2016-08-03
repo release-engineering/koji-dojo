@@ -41,7 +41,9 @@ generate_ssl_certificates() {
 
 	# CA
 	conf=confs/ca.cnf
-	cp ssl.cnf $conf
+	CA_SAN="IP.1:${IP},DNS.1:localhost,DNS.2:${IP},email:move"
+ 
+	cat ssl.cnf | sed "s/email\:move/${CA_SAN}/"> $conf	cp ssl.cnf $conf
 
 	openssl genrsa -out private/koji_ca_cert.key 2048
 	openssl req -config $conf -new -x509 -subj "/C=US/ST=Drunken/L=Bed/O=IT/CN=koji-hub" -days 3650 -key private/koji_ca_cert.key -out koji_ca_cert.crt -extensions v3_ca
