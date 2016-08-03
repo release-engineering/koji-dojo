@@ -93,3 +93,12 @@ koji/__init__.py@1040:
            'epoch': None}
     # for backwards-compatibility
     nvr['package_name'] = nvr['name']
+
+kojihub.py@8182:
+
+ def makeTask(self,*args,**opts):
+        #this is mainly for debugging
+        #only an admin can make arbitrary tasks
+        context.session.assertPerm('admin')
+        return make_task(*args,**opts)
+

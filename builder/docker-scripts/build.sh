@@ -2,4 +2,5 @@
 
 DIR=$(dirname $(dirname $(realpath $0)))
 
-docker build --tag=docker.io/buildchimp/koji-dojo-builder $DIR
+set -x
+docker build --tag=docker.io/buildchimp/koji-dojo-builder:dev $DIR
