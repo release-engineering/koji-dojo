@@ -147,10 +147,10 @@ kojitest add-external-repo -t build-tag buil-external-repo http://myorg.com/rpm-
 
 # example of importing external archives
 # resolve imported dependency (all artifacts for given gav)
-mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:pom
-mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar
-mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar -Dclassifier=javadoc
-mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar -Dclassifier=sources
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:pom
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar:javadoc
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:get -DrepoUrl=http://central.maven.org/maven2/ -Dartifact=org.apache.maven.plugins:maven-enforcer-plugin:1.4:jar:sources
 
 # import maven artifacts of imported package
 kojitest import-archive --create-build --type maven --type-info ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4.pom org.apache.maven.plugins-maven-enforcer-plugin-1.4-1 ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4.jar ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4-javadoc.jar ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4.pom ~/.m2/repository/org/apache/maven/plugins/maven-enforcer-plugin/1.4/maven-enforcer-plugin-1.4-sources.jar
