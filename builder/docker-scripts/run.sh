@@ -9,4 +9,4 @@
 # Reference: https://github.com/mmornati/docker-mock-rpmbuilder
 #
 #docker run --cap-add=SYS_ADMIN -ti --name=koji-builder -v /opt/koji-files:/mnt/koji --link koji-db --link koji-hub docker.io/buildchimp/koji-dojo-builder
-docker run --privileged=true -ti --name=koji-builder -v /opt/koji:/opt/koji -v /opt/koji-files:/mnt/koji --link koji-db --link koji-hub docker.io/buildchimp/koji-dojo-builder
+docker run --privileged=true -ti --name=koji-builder -v /opt/koji:/opt/koji -v /opt/koji-files:/mnt/koji --link koji-db --link koji-hub docker.io/buildchimp/koji-dojo-builder:dev
