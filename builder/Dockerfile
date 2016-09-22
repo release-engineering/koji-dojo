@@ -16,6 +16,7 @@ RUN yum -y update && \
         openssh-server \
         openssh-clients \
         wget \
+        createrepo \
     ; yum clean all
 
 ADD bin/ /usr/local/bin/
