@@ -81,9 +81,12 @@ by using pk12util:
 
 ## Builder notes
 
-To use builder please use builder/docker-scripts/build-all.sh to build hub image instead of hub//docker-scripts/build.sh (please see comments inside the script for explanation)
+To use builder please use builder/docker-scripts/build-all.sh to build hub image instead of hub/docker-scripts/build.sh (please see comments inside the script for explanation)
 
-To start koji-db, koji-hub and koji-builder please use builder/docker-scripts/run.sh
+To start koji-db, koji-hub and koji-builder at once use builder/docker-scripts/run-all.sh
+
+To start only koji-builder use builder/docker-scripts/run.sh
+
 
 Example of builder bootstrap:
 

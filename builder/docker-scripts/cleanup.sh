@@ -11,3 +11,6 @@ stop_and_remove_container_and_image() {
 }
 
 stop_and_remove_container_and_image builder
+
+
+docker rmi $( docker images -q -f dangling=true)
