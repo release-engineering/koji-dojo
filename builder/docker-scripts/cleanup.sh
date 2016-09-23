@@ -7,7 +7,10 @@ stop_and_remove_container_and_image() {
     echo "Remove container koji-$name"
     docker rm koji-$name
     echo "Remove container image buildchimp/koji-dojo-$name"
-    docker rmi -f buildchimp/koji-dojo-$name
+    docker rmi -f buildchimp/koji-dojo-$name:dev
 }
 
 stop_and_remove_container_and_image builder
+
+
+docker rmi $( docker images -q -f dangling=true)

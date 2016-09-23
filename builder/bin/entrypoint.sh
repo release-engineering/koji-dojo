@@ -16,6 +16,7 @@ wait_for_koji_hub_to_start() {
 install_builder() {
     if [ -d /opt/koji/noarch ]; then
         echo "Installing from /opt/koji/noarch"
+        yum -y localinstall /opt/koji/noarch/koji-1*.rpm
         yum -y localinstall /opt/koji/noarch/koji-builder*.rpm
     else
         echo "No koji RPM to install! Installing from EPEL"
