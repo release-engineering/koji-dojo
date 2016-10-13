@@ -52,5 +52,9 @@ ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key
 
 IP=$(find-ip.py)
 
-echo "SSHd listening on: ${IP}:22"
-/usr/sbin/sshd -D
+#echo "SSHd listening on: ${IP}:22"
+#/usr/sbin/sshd -D
+
+echo "Koji client environment started on ${IP}"
+exec /bin/bash -l
+

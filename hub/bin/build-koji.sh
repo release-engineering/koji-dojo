@@ -3,7 +3,11 @@
 set -x
 
 if [ ! -d "/opt/koji/.git" ]; then
-    git clone https://pagure.io/koji.git /opt/koji
+	# allow building from other locations / branches.
+	GIT_URL=${GIT_URL:-https://pagure.io/koji.git}
+	GIT_BRANCH=${GIT_BRANCH:-master}
+
+    git clone --branch ${GIT_BRANCH} --verbose --progress ${GIT_URL} /opt/koji 2>&1
 fi
 
 # install the latest version of python-coverage module
