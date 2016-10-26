@@ -11,8 +11,8 @@ koji-hub:
     build: hub
     hostname: koji-hub
     volumes:
-        - /opt/koji:/opt/koji:rw
-        - /opt/koji-clients:/opt/koji-clients:rw
+        - /opt/koji:/opt/koji:rw,z
+        - /opt/koji-clients:/opt/koji-clients:rw,z
     links:
         - koji-db
 
