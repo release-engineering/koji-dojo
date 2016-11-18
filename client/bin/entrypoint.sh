@@ -17,8 +17,9 @@ if [ -d /opt/koji/noarch ]; then
 	yum -y localinstall /opt/koji/noarch/koji-1*.rpm
 else
 	echo "No koji RPM to install! Installing from EPEL"
-	yum -y install epel-release
-  yum -y install koji
+	#already in docker file
+#	yum -y install epel-release
+	yum -y install koji
 fi
 
 mkdir /root/{.koji,bin}

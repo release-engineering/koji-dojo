@@ -1,4 +1,4 @@
-FROM centos:centos6
+FROM centos:centos7
 MAINTAINER John Casey <jcasey@redhat.com>
 
 #RUN sed -i '/excludedocs/d' /etc/rpm/macros.imgcreate
@@ -7,8 +7,9 @@ RUN sed -i '/nodocs/d' /etc/yum.conf
 VOLUME ["/opt/koji-clients", "/opt/koji"]
 
 RUN yum -y update && \
-    yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && \
+#    yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && \
     yum -y install \
+        epel-release \
         git \
         yum-utils \
         tar \
