@@ -7,7 +7,7 @@ RUN sed -i '/nodocs/d' /etc/yum.conf
 VOLUME ["/opt/koji-clients", "/opt/koji"]
 
 RUN yum -y update && \
-    yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && \
+    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm && \
     yum -y install \
         git \
         yum-utils \
