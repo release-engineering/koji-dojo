@@ -1,4 +1,4 @@
-FROM centos:centos6
+FROM centos:centos7
 MAINTAINER John Casey <jcasey@redhat.com>
 
 #RUN sed -i '/excludedocs/d' /etc/rpm/macros.imgcreate

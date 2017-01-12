@@ -6,9 +6,9 @@ Koji dojo is a suite of Docker images that are designed to enable automated test
 
 Currently, there are three images:
 
-* `hub/` - This is a simplistic build of the Koji hub service, configured to enable SSL authentication. It is based on the CentOS 6 Docker image
-* `client/` - This is a minimal CentOS 6 image that mounts volumes from the hub container and installs the Koji client RPM from it. It will also link and configure scripts for each of the users generated in the hub setup.
-* `builder/` - This is a simplistic build of the Koji builder service connected to hub. It is based on the CentOS 6 Docker image
+* `hub/` - This is a simplistic build of the Koji hub service, configured to enable SSL authentication. It is based on the CentOS 7 Docker image
+* `client/` - This is a minimal CentOS 7 image that mounts volumes from the hub container and installs the Koji client RPM from it. It will also link and configure scripts for each of the users generated in the hub setup.
+* `builder/` - This is a simplistic build of the Koji builder service connected to hub. It is based on the CentOS 7 Docker image
 
 ## Docker Maintenance Scripts
 

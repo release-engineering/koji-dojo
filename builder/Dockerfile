@@ -1,13 +1,17 @@
-FROM centos:centos6
+FROM centos:centos7
 MAINTAINER John Casey <jcasey@redhat.com>
 
 #RUN sed -i '/excludedocs/d' /etc/rpm/macros.imgcreate
 RUN sed -i '/nodocs/d' /etc/yum.conf
 
 RUN yum -y update && \
-    yum -y install wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm && \
+    yum -y install wget && \
+#    wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm && \
+#    yum -y install epel-release-latest-6.noarch.rpm && \
+#    rm epel-release-latest-6.noarch.rpm && \
     yum -y install \
         lsof \
+	epel-release \
         python-simplejson \
         python-multilib \
         openssh-server \

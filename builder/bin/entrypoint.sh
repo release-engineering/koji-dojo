@@ -86,7 +86,8 @@ start_ssh() {
         ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key
         /usr/sbin/sshd -D
     else
-        /etc/init.d/sshd start
+#        /etc/init.d/sshd start
+        /usr/sbin/sshd
     fi
 }
 
@@ -96,7 +97,8 @@ start_builder() {
     if [ "$RUN_IN_FOREGROUND" == "RUN_IN_FOREGROUND" ]; then
         /usr/sbin/kojid -d -v -f --force-lock
     else
-        /etc/init.d/kojid start
+        #/etc/init.d/kojid start
+	/usr/sbin/kojid
     fi
 }
 
