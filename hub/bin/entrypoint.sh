@@ -1,4 +1,12 @@
 #!/bin/bash
+set -x
+
+# add koji-db to hosts if not present
+KOJI_DB="${KOJI_DB:-koji-db}"
+if grep -q -v "koji-db" /etc/hosts; then
+    KOJI_DB_IP=$(getent hosts $KOJI_DB | awk '{ print $1 }')
+    echo ${KOJI_DB_IP} koji-db >> /etc/hosts
+fi
 
 build-koji.sh
 setup.sh
