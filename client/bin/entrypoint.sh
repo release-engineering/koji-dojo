@@ -1,4 +1,11 @@
 #!/bin/bash
+set -x
+
+# add koji-hub to hosts if not present
+if [ -n "$KOJI_HUB" ]; then
+    KOJI_HUB_IP=$(getent hosts $KOJI_HUB | awk '{ print $1 }')
+    echo ${KOJI_HUB_IP} koji-hub >> /etc/hosts
+fi
 
 while true; do
 	echo "Waiting for koji-hub to start..."
