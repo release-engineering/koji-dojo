@@ -1,0 +1,491 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: koji
+objects:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: koji-dojo-config
+  data:
+    koji.git.url: https://pagure.io/koji.git
+    koji.git.branch: master
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: koji-volume
+  spec:
+    capacity:
+      storage: 1Gi
+    accessModes:
+      - ReadWriteMany
+    persistentVolumeReclaimPolicy: Retain
+    hostPath:
+      path: ${VOLUME_PATH}/koji-volume
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: koji-clients-volume
+  spec:
+    capacity:
+      storage: 1Gi
+    accessModes:
+      - ReadWriteMany
+    persistentVolumeReclaimPolicy: Retain
+    hostPath:
+      path: ${VOLUME_PATH}/koji-clients-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: hub-koji-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+    volumeName: koji-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: hub-koji-clients-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+    volumeName: koji-clients-volume
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: builder
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: koji-builder:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: builder
+      git:
+        ref: ${KOJI_DOJO_BRANCH}
+        uri: ${KOJI_DOJO_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: client
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: koji-client:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: client
+      git:
+        ref: ${KOJI_DOJO_BRANCH}
+        uri: ${KOJI_DOJO_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: hub
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: koji-hub:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: hub
+      git:
+        ref: ${KOJI_DOJO_BRANCH}
+        uri: ${KOJI_DOJO_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-builder
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-client
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-hub
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-builder
+  spec:
+    replicas: 2
+    selector:
+      name: builder
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/scc: privileged
+        creationTimestamp: null
+        labels:
+          name: builder
+      spec:
+        containers:
+        - env:
+          - name: KOJI_HUB
+            value: hub.${NAMESPACE}.svc.cluster.local
+          image: koji-builder
+          imagePullPolicy: IfNotPresent
+          name: koji-builder
+          resources: {}
+          securityContext:
+            privileged: false
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /opt/koji
+            name: koji-volume
+          - mountPath: /opt/koji-clients
+            name: koji-clients
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: koji-volume
+          persistentVolumeClaim:
+            claimName: hub-koji-claim
+        - name: koji-clients
+          persistentVolumeClaim:
+            claimName: hub-koji-clients-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - koji-builder
+        from:
+          kind: ImageStreamTag
+          name: koji-builder:latest
+          namespace: koji
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-client
+  spec:
+    replicas: 1
+    selector:
+      name: client
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/scc: privileged
+        creationTimestamp: null
+        labels:
+          name: client
+      spec:
+        containers:
+        - env:
+          - name: KOJI_HUB
+            value: hub.${NAMESPACE}.svc.cluster.local
+          image: koji-client
+          imagePullPolicy: IfNotPresent
+          name: koji-client
+          resources: {}
+          securityContext:
+            privileged: false
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /opt/koji
+            name: koji-volume
+          - mountPath: /opt/koji-clients
+            name: koji-clients
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: koji-volume
+          persistentVolumeClaim:
+            claimName: hub-koji-claim
+        - name: koji-clients
+          persistentVolumeClaim:
+            claimName: hub-koji-clients-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - koji-client
+        from:
+          kind: ImageStreamTag
+          name: koji-client:latest
+          namespace: koji
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-db
+  spec:
+    replicas: 1
+    selector:
+      name: db
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: db
+      spec:
+        containers:
+        - env:
+          - name: POSTGRESQL_DATABASE
+            value: koji
+          - name: POSTGRESQL_USER
+            value: koji
+          - name: POSTGRESQL_PASSWORD
+            value: mypassword
+          image: openshift/postgresql-92-centos7
+          imagePullPolicy: IfNotPresent
+          name: koji-db
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: koji-hub
+  spec:
+    replicas: 1
+    selector:
+      name: hub
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/scc: privileged
+        creationTimestamp: null
+        labels:
+          name: hub
+      spec:
+        containers:
+        - env:
+          - name: KOJI_DB
+            value: db.${NAMESPACE}.svc.cluster.local
+          - name: ADDITIONAL_SAN
+            value: ${PUBLIC_IP}
+          image: koji-hub
+          imagePullPolicy: IfNotPresent
+          name: koji-hub
+          ports:
+          - containerPort: 22
+            protocol: TCP
+          - containerPort: 80
+            protocol: TCP
+          - containerPort: 443
+            protocol: TCP
+          resources: {}
+          securityContext:
+            privileged: false
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /opt/koji
+            name: koji-volume
+          - mountPath: /opt/koji-clients
+            name: koji-clients
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: koji-volume
+          persistentVolumeClaim:
+            claimName: hub-koji-claim
+        - name: koji-clients
+          persistentVolumeClaim:
+            claimName: hub-koji-clients-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - koji-hub
+        from:
+          kind: ImageStreamTag
+          name: koji-hub:latest
+          namespace: koji
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: db
+  spec:
+    ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+    selector:
+      name: db
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: hub
+  spec:
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+    selector:
+      name: hub
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    name: https
+  spec:
+    host: ${PUBLIC_IP}.xip.io
+    port:
+      targetPort: https
+    tls:
+      termination: passthrough
+    to:
+      kind: Service
+      name: hub
+      weight: 100
+    wildcardPolicy: None
+parameters:
+  - name: PUBLIC_IP 
+    displayName: Public IP of openshift router
+    value: 10.3.9.64
+    required: true
+  - name: NAMESPACE 
+    displayName: Current namespace
+    value: koji
+    required: true
+  - name: VOLUME_PATH
+    displayName: Path for volumes on a single node
+    value: /volumes
+    required: true 
+  - name: KOJI_DOJO_REMOTE
+    displayName: Remote for koji dojo
+    value: https://github.com/release-engineering/koji-dojo
+    required: true 
+  - name: KOJI_DOJO_BRANCH
+    displayName: koji dojo branch
+    value: master
+    required: true 
