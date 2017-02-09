@@ -64,5 +64,10 @@ IP=$(find-ip.py)
 #/usr/sbin/sshd -D
 
 echo "Koji client environment started on ${IP}"
-exec /bin/bash -l
+# This won't work in openshift
+if [ -n "$KOJI_HUB" ]; then
+	while true; do sleep 10000; done
+else
+	exec /bin/bash -l
+fi
 
