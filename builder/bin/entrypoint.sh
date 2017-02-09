@@ -105,6 +105,13 @@ start_builder() {
 set -x
 IP=$(find-ip.py)
 
+# add koji-hub to hosts if not present
+if [ -n "$KOJI_HUB" ]; then
+    KOJI_HUB_IP=$(getent hosts $KOJI_HUB | awk '{ print $1 }')
+    echo ${KOJI_HUB_IP} koji-hub >> /etc/hosts
+fi
+
+
 wait_for_koji_hub_to_start
 install_builder
 configure_builder
