@@ -5,10 +5,6 @@ MAINTAINER John Casey <jcasey@redhat.com>
 RUN sed -i '/nodocs/d' /etc/yum.conf
 
 RUN yum -y update && \
-    yum -y install wget && \
-#    wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm && \
-#    yum -y install epel-release-latest-6.noarch.rpm && \
-#    rm epel-release-latest-6.noarch.rpm && \
     yum -y install \
         lsof \
 	epel-release \
@@ -18,7 +14,7 @@ RUN yum -y update && \
         openssh-clients \
         wget \
         createrepo \
-    ; yum clean all
+    &&  yum clean all
 
 ADD bin/ /usr/local/bin/
 
