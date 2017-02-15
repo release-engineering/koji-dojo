@@ -29,7 +29,7 @@ Currently, there are three images:
 
 ## Hub Image Notes
 
-When the hub initializes, it checks out Koji sources from Git, builds them, and installs the koji-hub* RPMs. The sources are cloned into `/opt/koji`, which is exposed as a Docker volume. This enables the `client` image to install the client RPM that was built in conjunction with the hub RPMs.
+When the hub initializes, it checks out Koji sources from Git, builds them, and installs the koji-hub\* RPMs. The sources are cloned into `/opt/koji`, which is exposed as a Docker volume. This enables the `client` image to install the client RPM that was built in conjunction with the hub RPMs.
 
 The Koji hub image generates three users on initialization:
 
