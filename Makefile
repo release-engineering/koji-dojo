@@ -5,6 +5,9 @@ KOJI = koji -c /opt/koji-clients/kojiadmin/config
 ## Build and run koji-dojo containers
 ## As a result, the koji-builder container with kojid will run interactively
 run:
+	sed 's|^allowed_scms.*|allowed_scms=pkgs.devel.redhat.com:/*:no:rhpkg,sources \
+	   src.fedoraproject.org:/*:no pkgs.fedoraproject.org:/*:no:fedpkg,sources|' \
+	   builder/bin/entrypoint.sh
 	cd builder/docker-scripts && ./build-all.sh && ./run-all.sh
 
 ## Remove koji-dojo Docker containers and images; cleanup build directories
@@ -21,9 +24,6 @@ sources:
 rpm-scratch-build: sources
 rpm-scratch-build:
 	$(KOJI) hello
-	sed 's|^allowed_scms.*|allowed_scms=pkgs.devel.redhat.com:/*:no:rhpkg,sources \
-	   src.fedoraproject.org:/*:no pkgs.fedoraproject.org:/*:no:fedpkg,sources|' \
-	   builder/bin/entrypoint.sh
 	$(KOJI) add-tag destination-tag --include-all --arches="noarch"
 	$(KOJI) add-tag build-tag --include-all --arches="x86_64"
 	$(KOJI) add-external-repo -t build-tag build-external-repo https://kojipkgs.fedoraproject.org/repos/f25-build/latest/\$$arch/
