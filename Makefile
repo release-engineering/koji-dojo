@@ -1,6 +1,6 @@
 KOJI = koji -c /opt/koji-clients/kojiadmin/config
 
-.PHONY: run clean rpm-scratch-build
+.PHONY: run clean sources rpm-scratch-build lint
 
 ## Build and run koji-dojo containers
 ## As a result, the koji-builder container with kojid will run interactively
