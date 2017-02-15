@@ -5,7 +5,7 @@ KOJI = koji -c /opt/koji-clients/kojiadmin/config
 ## Build and run koji-dojo containers
 ## As a result, the koji-builder container with kojid will run interactively
 run:
-	sed 's|^allowed_scms.*|allowed_scms=pkgs.devel.redhat.com:/*:no:rhpkg,sources \
+	sed -i 's|^allowed_scms.*|allowed_scms=pkgs.devel.redhat.com:/*:no:rhpkg,sources \
 	   src.fedoraproject.org:/*:no pkgs.fedoraproject.org:/*:no:fedpkg,sources|' \
 	   builder/bin/entrypoint.sh
 	cd builder/docker-scripts && ./build-all.sh && ./run-all.sh
