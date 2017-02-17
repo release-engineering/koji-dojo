@@ -1,0 +1,34 @@
+From 39a6cc38659e4cfc69fabd49372a8f4452e4a5ea Mon Sep 17 00:00:00 2001
+From: Tomas Kopecek <tkopecek@redhat.com>
+Date: Jan 31 2017 16:23:35 +0000
+Subject: Fix options.force in import_comps
+
+
+Change from opts.force to opts['force'] was introduced in
+434bfb86f42b815ef2a014fc476a169e061dfd1c, but this one is not working
+now.
+
+---
+
+diff --git a/cli/koji b/cli/koji
+index 22e0373..cb2e3a8 100755
+--- a/cli/koji
++++ b/cli/koji
+@@ -1800,7 +1800,7 @@ def _import_comps(session, filename, tag, options):
+     """Import comps data using libcomps module"""
+     comps = libcomps.Comps()
+     comps.fromxml_f(filename)
+-    force = options['force']
++    force = options.force
+     ptypes = {
+         libcomps.PACKAGE_TYPE_DEFAULT : 'default',
+         libcomps.PACKAGE_TYPE_OPTIONAL : 'optional',
+@@ -1834,7 +1834,7 @@ def _import_comps_alt(session, filename, tag, options):
+     print 'WARN: yum.comps does not support the biarchonly of group and basearchonly of package'
+     comps = yumcomps.Comps()
+     comps.add(filename)
+-    force = options['force']
++    force = options.force
+     for group in comps.groups:
+         print "Group: %(groupid)s (%(name)s)" % vars(group)
+         session.groupListAdd(tag, group.groupid, force=force, display_name=group.name,
