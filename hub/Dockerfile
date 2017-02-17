@@ -7,39 +7,48 @@ RUN sed -i '/nodocs/d' /etc/yum.conf
 VOLUME ["/opt/koji-clients", "/opt/koji"]
 
 RUN yum -y update && \
-#    yum install -y http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && \
     yum -y install \
+        bzip2 \
         epel-release \
         git \
-        yum-utils \
-        tar \
-        bzip2 \
-        rpm-build \
-        make \
-        patch \
         httpd \
-        mod_wsgi \
-        mod_ssl \
+        libcomps \
         lsof \
-        python-simplejson \
+        make \
+        mod_auth_kerb \
+        mod_ssl \
+        mod_wsgi \
+        openssh-server \
+        patch \
+        postgresql \
         PyGreSQL \
         pyOpenSSL \
-        python-krbV \
-        python-qpid \
-        python-saslwrapper \
-        saslwrapper \
-        postgresql \
-        sudo \
-        mod_auth_kerb \
+        python-backports \
+        python-backports-ssl_match_hostname \
         python-cheetah \
+        python-coverage \
+        python-dateutil \
+        python-kerberos \
+        python-krbV \
+        python-libcomps \
         python-markdown \
         python-pygments \
+        python-qpid \
+        python-requests \
+        python-requests-kerberos \
+        python-saslwrapper \
         python-setuptools \
+        python-simplejson \
+        python-six \
         python-sphinx \
-        python-coverage \
-        openssh-server \
+        python-urllib3 \
+        rpm-build \
+        saslwrapper \
+        sudo \
+        tar \
         wget \
-    ; yum clean all
+        yum-utils \
+    && yum clean all
 
 ADD etc/ /etc/
 ADD bin/ /usr/local/bin/
