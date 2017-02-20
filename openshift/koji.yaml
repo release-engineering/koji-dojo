@@ -158,10 +158,7 @@ objects:
           name: builder
       spec:
         containers:
-        - env:
-          - name: KOJI_HUB
-            value: hub.${NAMESPACE}.svc.cluster.local
-          image: koji-builder
+        - image: koji-builder
           imagePullPolicy: IfNotPresent
           name: koji-builder
           resources: {}
@@ -224,10 +221,7 @@ objects:
           name: client
       spec:
         containers:
-        - env:
-          - name: KOJI_HUB
-            value: hub.${NAMESPACE}.svc.cluster.local
-          image: koji-client
+        - image: koji-client
           imagePullPolicy: IfNotPresent
           name: koji-client
           resources: {}
@@ -319,7 +313,7 @@ objects:
   metadata:
     creationTimestamp: null
     generation: 1
-    name: koji-hub
+    name: hub
   spec:
     replicas: 1
     selector:
@@ -341,8 +335,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: KOJI_DB
-            value: db.${NAMESPACE}.svc.cluster.local
           - name: ADDITIONAL_SAN
             value: ${PUBLIC_IP}
           image: koji-hub
@@ -394,7 +386,7 @@ objects:
   kind: Service
   metadata:
     creationTimestamp: null
-    name: db
+    name: koji-db
   spec:
     ports:
     - port: 5432
@@ -410,7 +402,7 @@ objects:
   kind: Service
   metadata:
     creationTimestamp: null
-    name: hub
+    name: koji-hub
   spec:
     ports:
     - name: http
@@ -438,7 +430,7 @@ objects:
       termination: passthrough
     to:
       kind: Service
-      name: hub
+      name: koji-hub
       weight: 100
     wildcardPolicy: None
 parameters:
