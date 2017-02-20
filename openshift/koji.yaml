@@ -12,30 +12,6 @@ objects:
     koji.git.url: https://pagure.io/koji.git
     koji.git.branch: master
 - apiVersion: v1
-  kind: PersistentVolume
-  metadata:
-    name: koji-volume
-  spec:
-    capacity:
-      storage: 1Gi
-    accessModes:
-      - ReadWriteMany
-    persistentVolumeReclaimPolicy: Retain
-    hostPath:
-      path: ${VOLUME_PATH}/koji-volume
-- apiVersion: v1
-  kind: PersistentVolume
-  metadata:
-    name: koji-clients-volume
-  spec:
-    capacity:
-      storage: 1Gi
-    accessModes:
-      - ReadWriteMany
-    persistentVolumeReclaimPolicy: Retain
-    hostPath:
-      path: ${VOLUME_PATH}/koji-clients-volume
-- apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     name: hub-koji-claim
@@ -163,7 +139,7 @@ objects:
     generation: 1
     name: koji-builder
   spec:
-    replicas: 2
+    replicas: 1
     selector:
       name: builder
     strategy:
@@ -177,22 +153,16 @@ objects:
       type: Rolling
     template:
       metadata:
-        annotations:
-          openshift.io/scc: privileged
         creationTimestamp: null
         labels:
           name: builder
       spec:
         containers:
-        - env:
-          - name: KOJI_HUB
-            value: hub.${NAMESPACE}.svc.cluster.local
-          image: koji-builder
+        - image: koji-builder
           imagePullPolicy: IfNotPresent
           name: koji-builder
           resources: {}
           securityContext:
-            privileged: false
             runAsUser: 0
           terminationMessagePath: /dev/termination-log
           volumeMounts:
@@ -203,6 +173,8 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
+        serviceAccount: koji-sa
+        serviceAccountName: koji-sa
         terminationGracePeriodSeconds: 30
         volumes:
         - name: koji-volume
@@ -244,22 +216,16 @@ objects:
       type: Rolling
     template:
       metadata:
-        annotations:
-          openshift.io/scc: privileged
         creationTimestamp: null
         labels:
           name: client
       spec:
         containers:
-        - env:
-          - name: KOJI_HUB
-            value: hub.${NAMESPACE}.svc.cluster.local
-          image: koji-client
+        - image: koji-client
           imagePullPolicy: IfNotPresent
           name: koji-client
           resources: {}
           securityContext:
-            privileged: false
             runAsUser: 0
           terminationMessagePath: /dev/termination-log
           volumeMounts:
@@ -270,6 +236,8 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
+        serviceAccount: koji-sa
+        serviceAccountName: koji-sa
         terminationGracePeriodSeconds: 30
         volumes:
         - name: koji-volume
@@ -345,7 +313,7 @@ objects:
   metadata:
     creationTimestamp: null
     generation: 1
-    name: koji-hub
+    name: hub
   spec:
     replicas: 1
     selector:
@@ -361,16 +329,12 @@ objects:
       type: Rolling
     template:
       metadata:
-        annotations:
-          openshift.io/scc: privileged
         creationTimestamp: null
         labels:
           name: hub
       spec:
         containers:
         - env:
-          - name: KOJI_DB
-            value: db.${NAMESPACE}.svc.cluster.local
           - name: ADDITIONAL_SAN
             value: ${PUBLIC_IP}
           image: koji-hub
@@ -385,7 +349,6 @@ objects:
             protocol: TCP
           resources: {}
           securityContext:
-            privileged: false
             runAsUser: 0
           terminationMessagePath: /dev/termination-log
           volumeMounts:
@@ -396,6 +359,8 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
+        serviceAccount: koji-sa
+        serviceAccountName: koji-sa
         terminationGracePeriodSeconds: 30
         volumes:
         - name: koji-volume
@@ -421,7 +386,7 @@ objects:
   kind: Service
   metadata:
     creationTimestamp: null
-    name: db
+    name: koji-db
   spec:
     ports:
     - port: 5432
@@ -437,7 +402,7 @@ objects:
   kind: Service
   metadata:
     creationTimestamp: null
-    name: hub
+    name: koji-hub
   spec:
     ports:
     - name: http
@@ -465,7 +430,7 @@ objects:
       termination: passthrough
     to:
       kind: Service
-      name: hub
+      name: koji-hub
       weight: 100
     wildcardPolicy: None
 parameters:
@@ -477,10 +442,6 @@ parameters:
     displayName: Current namespace
     value: koji
     required: true
-  - name: VOLUME_PATH
-    displayName: Path for volumes on a single node
-    value: /volumes
-    required: true 
   - name: KOJI_DOJO_REMOTE
     displayName: Remote for koji dojo
     value: https://github.com/release-engineering/koji-dojo
