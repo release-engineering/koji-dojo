@@ -1,6 +1,19 @@
+## Shortcuts for common koji-dojo operations.
+
 KOJI = koji -c /opt/koji-clients/kojiadmin/config
 
 .PHONY: run clean sources rpm-scratch-build lint
+
+## Install and configure Docker
+init:
+	test "$$USER" = 'root'
+	dnf install -y docker vim-enhanced tree
+	sudo systemctl enable docker
+	sudo systemctl start docker
+
+## Install vagrant
+init-vagrant:
+	dnf install vagrant vagrant-libvirt
 
 ## Build koji-dojo containers
 build:
@@ -42,8 +55,3 @@ rpm-scratch-build:
 	$(KOJI) add-target build-target build-tag destination-tag
 	$(KOJI) build --scratch build-target koji-1.10.1-13.fc25.src.rpm
 	find /opt/koji-files/scratch/ -newer /tmp/0_o -name \*rpm
-
-## TODO Verify the installation for common problems
-lint:
-	# TODO make sure selunux is disabled
-	# make sure /opt/koji-files permissions set to 777

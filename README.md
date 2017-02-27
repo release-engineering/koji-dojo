@@ -177,3 +177,28 @@ kojitest add-pkg --owner=kojiadmin destination-tag myproject
 kojitest maven-build build-target https://www.github.com/myorg/myproject
 
 ~~~~
+
+## Vagrant wrapper for koji-dojo
+
+You can install Koji-Dojo inside a Vagrant VM.
+
+The pre-requisite is Vagrant with libvirt provider installed on the workstation.
+
+```
+# First-time execution
+vagrant up
+# - which will provision both the Vagrant VM and koji-dojo Docker containers inside it
+
+vagrant ssh -c 'sudo make -C /vagrant run' # will start the Docker containers and leave koji-builder running interactively
+
+# ...and while it's running, in a separate console
+vagrant ssh -c 'sudo make -C /vagrant sources rpm-scratch-build'
+# - which will apply a patch to Koji which makes 'import-comps' command work, and then run a demo Koji task
+
+# Map Koji UI host/port to the Vagrant host VM. This makes Koji UI available on http://localhost:4433/koji
+ssh localhost -L*:4433:172.17.0.3:443
+
+# Drop the Vagrant VM to try again:
+vagrant destroy -f && vagrant up
+# ... and continue from the beginning
+```
