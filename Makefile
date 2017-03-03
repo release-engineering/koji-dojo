@@ -37,7 +37,7 @@ clean:
 
 ## TODO Use fedpkg sources (?)
 sources:
-	wget http://fedora.mirrors.ovh.net/linux/releases/25/Everything/source/tree/Packages/k/koji-1.10.1-13.fc25.src.rpm
+	#wget http://fedora.mirrors.ovh.net/linux/releases/25/Everything/source/tree/Packages/k/koji-1.10.1-13.fc25.src.rpm
 	patch -f -d /usr/bin < ./patches/koji-pr-307.patch ; \
 		printf "Attempted to patch koji, skipping possible 'Already patched' errors\nDone\n"
 
@@ -45,13 +45,5 @@ sources:
 ## Run a demo build task that builds koji RPM packages for Fedora 25
 rpm-scratch-build: sources
 rpm-scratch-build:
-	$(KOJI) hello
-	$(KOJI) add-tag destination-tag --include-all --arches="noarch"
-	$(KOJI) add-tag build-tag --include-all --arches="x86_64"
-	$(KOJI) add-external-repo -t build-tag build-external-repo https://kojipkgs.fedoraproject.org/repos/f25-build/latest/\$$arch/
-	koji show-groups --comps f25-build | $(KOJI) import-comps /dev/stdin build-tag
-	touch /tmp/0_o
-	$(KOJI) regen-repo build-tag
-	$(KOJI) add-target build-target build-tag destination-tag
-	$(KOJI) build --scratch build-target koji-1.10.1-13.fc25.src.rpm
-	find /opt/koji-files/scratch/ -newer /tmp/0_o -name \*rpm
+	export KOJI='$(KOJI)' ; sh -x ./buildroot/$(buildroot)
+

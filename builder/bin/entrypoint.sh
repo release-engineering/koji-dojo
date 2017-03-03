@@ -3,7 +3,7 @@
 wait_for_koji_hub_to_start() {
     while true; do
         echo "Waiting for koji-hub to start..."
-        hubstart=$(curl -X GET http://koji-hub/)
+        hubstart=$(curl -X GET http://172.17.0.3/)
         #echo $hubstart
         if [ "x$hubstart" != "x" ]; then
             echo "koji-hub started:"
@@ -28,9 +28,9 @@ install_builder() {
 configure_builder() {
     echo "Configure builder to connect to koji-hub"
 
-    wget http://koji-hub/clients/kojibuilder/client.crt -O /etc/kojid/kojibuilder.crt
-    wget http://koji-hub/clients/kojibuilder/clientca.crt -O /etc/kojid/koji_client_ca_cert.crt
-    wget http://koji-hub/clients/kojibuilder/serverca.crt -O /etc/kojid/koji_server_ca_cert.crt
+    wget http://172.17.0.3/clients/kojibuilder/client.crt -O /etc/kojid/kojibuilder.crt
+    wget http://172.17.0.3/clients/kojibuilder/clientca.crt -O /etc/kojid/koji_client_ca_cert.crt
+    wget http://172.17.0.3/clients/kojibuilder/serverca.crt -O /etc/kojid/koji_server_ca_cert.crt
 
 
 # delete line starting with allowed_scms=
@@ -45,14 +45,14 @@ sed -i.bak '/allowed_scms=/d' /etc/kojid/kojid.conf
 allowed_scms=myrepo.com:/*:no github.com:/*:no
 
 ; The URL for the xmlrpc server
-server=http://koji-hub/kojihub
+server=http://172.17.0.3/kojihub
 
 ; the username has to be the same as what you used with add-host
 ; in this example follow as below
 user = kojibuilder
 
 ; The URL for the file access
-topurl=http://koji-hub/kojifiles
+topurl=http://172.17.0.3/kojifiles
 
 ; The directory root for temporary storage
 workdir=/tmp/koji

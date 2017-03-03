@@ -1,0 +1,10 @@
+KOJI="koji -c /opt/koji-clients/kojiadmin/config"
+$KOJI hello
+$KOJI add-tag destination-tag --include-all --arches="noarch"
+$KOJI add-tag build-tag --include-all --arches="x86_64"
+$KOJI add-external-repo -t build-tag build-external-repo https://kojipkgs.fedoraproject.org/repos/f25-build/latest/\$arch/
+koji show-groups --comps f25-build | $KOJI import-comps /dev/stdin build-tag
+$KOJI regen-repo build-tag
+$KOJI add-target build-target build-tag destination-tag
+#$KOJI build build-target git://pkgs.fedoraproject.org/rpms/koji/#origin/f25
+$KOJI build --scratch build-target git://pkgs.fedoraproject.org/rpms/koji/#origin/f25

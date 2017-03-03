@@ -1,0 +1,12 @@
+$KOJI add-tag destination-tag --include-all --arches="x86_64"
+$KOJI add-tag build-tag --include-all --arches="x86_64"
+$KOJI add-external-repo -t build-tag build-external-repo http://centos.eecs.wsu.edu/7/os/x86_64/
+$KOJI add-target build-target build-tag destination-tag
+koji -c centos.conf show-groups --comps cloud7-el7-build | $KOJI import-comps /dev/stdin build-tag
+$KOJI regen-repo build-tag
+
+[[ ! -z `find ~/ -name stub-0-1.fc24.src.rpm | grep '/rpmbuild/SRPMS/'` ]] && rpmbuild -bs ./buildroot/stub.spec
+result=$(find ~/ -name "stub-0-1*")
+#$(KOJI) build build-target $result
+$KOJI build --scratch build-target $result
+
