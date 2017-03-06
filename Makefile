@@ -27,7 +27,7 @@ run:
 	sudo docker rm -f koji-hub koji-builder koji-db;\
 		printf "Attempted to drop existing containers, ignoring the missing ones.\nDone\n";
 	rm -rf /opt/koji-{clients,files}/*
-	cd builder/docker-scripts && ./run-all.sh
+	cd builder/docker-scripts && ./run-all.sh -d
 
 ## Remove koji-dojo Docker containers and images; cleanup build directories
 clean:
