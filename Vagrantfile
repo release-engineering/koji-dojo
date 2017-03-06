@@ -71,6 +71,7 @@ Vagrant.configure(2) do |config|
     sudo mkdir -p /opt/koji-files
     sudo chmod 777 -R /opt/koji-files
     sudo make -C /vagrant build
+    sudo dnf -y install rpm-build
   SHELL
 
 end
