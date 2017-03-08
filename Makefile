@@ -47,3 +47,5 @@ rpm-scratch-build: sources
 rpm-scratch-build:
 	export KOJI='$(KOJI)' ; sh -x ./buildroot/$(buildroot)
 
+dbshell:
+	vagrant ssh -c 'sudo docker exec -it koji-db psql koji -U koji'
