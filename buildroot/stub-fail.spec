@@ -1,14 +1,27 @@
-Name:           stub
-Version:        0
+Name:           test-package-fail
+Version:        1
 Release:        1%{?dist}
-Summary:        Testing empty package
+Summary:        Testing package fail
                                                                                                                                                                                                                                              
 Group:          Applications/System                                                                                                                                                                                                          
 License:        GPLv2                                                                                                                                                                                                                        
 URL:            http://nonexistent                                                                                                                                                                                                           
                                                                                                                                                                                                                                              
 %description                                                                                                                                                                                                                                 
-Test rpm                                                                                                                                                                                                                                     
+Test rpm fail
+
+%prep
+#%setup -q
+a.sh
+
+%build
+
+
+%install
+
+
+%files
+%doc                                                                                                                                                                                                                               
                                                                                                                                                                                                                                              
                                                                                                                                                                                                                                              
 %changelog                                                                                                                                                                                                                                   

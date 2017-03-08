@@ -5,11 +5,10 @@ $KOJI add-target build-target build-tag destination-tag
 koji -c buildroot/centos.conf show-groups --comps cloud7-el7-build | $KOJI import-comps /dev/stdin build-tag
 $KOJI regen-repo build-tag
 
-RPM=stub-0-1.fc2*.src.rpm
+RPM=test-package-fail-1-1.fc2*.src.rpm
 result=./rpmbuild/SRPMS/$RPM
-[[ ! -e $result ]] && rpmbuild -bs ./buildroot/stub.spec
+[[ ! -e $result ]] && rpmbuild -bs ./buildroot/stub-fail.spec
 result=~/${result}
 #$(KOJI) build build-target $result
 $KOJI build --scratch build-target $result
-
 
