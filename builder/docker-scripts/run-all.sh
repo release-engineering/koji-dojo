@@ -19,7 +19,7 @@ docker run -d --name=koji-hub \
 koji_builder_run_mode='-ti'
 
 # if there's '-d' option, run koji-builder on background
-#test "$#" -gt 0 -a "$1" = '-d' && koji_builder_run_mode='-d'
+test "$#" -gt 0 -a "$1" = '-d' && koji_builder_run_mode='-d'
 
 docker run $koji_builder_run_mode --name=koji-builder --privileged=true \
     -v /opt/koji-files:/mnt/koji -v /opt/koji:/opt/koji \
