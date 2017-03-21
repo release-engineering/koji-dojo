@@ -64,14 +64,5 @@ Vagrant.configure(2) do |config|
     sed -i 's/SELINUX=.*/SELINUX=disabled/' /etc/selinux/config 
   SHELL
   config.vm.provision :reload
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo dnf -y install docker make koji wget patch
-    sudo systemctl enable docker
-    sudo systemctl start docker
-    sudo mkdir -p /opt/koji-files
-    sudo chmod 777 -R /opt/koji-files
-    sudo make -C /vagrant build
-    sudo dnf -y install rpm-build
-  SHELL
-
+  config.vm.provision "shell", path:'./start-containers.sh'
 end
