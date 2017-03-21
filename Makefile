@@ -1,51 +1,32 @@
-## Shortcuts for common koji-dojo operations.
+# Shortcuts for common koji-dojo operations
+# See ./vagrant-guest.mk for the targets that run inside Vagrant guest VM
 
-KOJI = koji -c /opt/koji-clients/kojiadmin/config
+MAKEFLAGS = -s
+DBDUMP_TEMPLATE = /tmp/koji-dojo-db-XXX.pgdump
 
-.PHONY: run clean sources rpm-scratch-build lint
+.PHONY: demo-build init-vagrant dbshell dbdump
 
-## Install and configure Docker
-init:
-	test "$$USER" = 'root'
-	dnf install -y docker vim-enhanced tree
-	sudo systemctl enable docker
-	sudo systemctl start docker
+demo-build:
+	vagrant ssh -c " \
+		sudo make -C /vagrant -f /vagrant/vagrant-guest.mk sources rpm-scratch-build"
 
-## Install vagrant
+# Install vagrant
 init-vagrant:
 	dnf install vagrant vagrant-libvirt
 
-## Build koji-dojo containers
-build:
-	sed -i 's|^allowed_scms.*|allowed_scms=pkgs.devel.redhat.com:/*:no:rhpkg,sources \
-	   src.fedoraproject.org:/*:no pkgs.fedoraproject.org:/*:no:fedpkg,sources|' \
-	   builder/bin/entrypoint.sh
-	cd builder/docker-scripts && ./build-all.sh
-
-## Start koji containers. koji-builder container with kojid will run interactively
-run:
-	sudo docker rm -f koji-hub koji-builder koji-db;\
-		printf "Attempted to drop existing containers, ignoring the missing ones.\nDone\n";
-	rm -rf /opt/koji-{clients,files}/*
-	cd builder/docker-scripts && ./run-all.sh -d
-
-## Remove koji-dojo Docker containers and images; cleanup build directories
-clean:
-	docker rm -f koji-hub koji-db koji-builder ;\
-	docker images | grep '^docker.io/buildchimp/koji-dojo-' | awk '{ print $$3 }' | xargs docker rmi ;\
-	rm -rf /opt/koji-files/[prsw]*
-
-## TODO Use fedpkg sources (?)
-sources:
-	#wget http://fedora.mirrors.ovh.net/linux/releases/25/Everything/source/tree/Packages/k/koji-1.10.1-13.fc25.src.rpm
-	patch -f -d /usr/bin < ./patches/koji-pr-307.patch ; \
-		printf "Attempted to patch koji, skipping possible 'Already patched' errors\nDone\n"
-
-
-## Run a demo build task that builds koji RPM packages for Fedora 25
-rpm-scratch-build: sources
-rpm-scratch-build:
-	export KOJI='$(KOJI)' ; sh -x ./buildroot/$(buildroot)
-
+# Open PostgreSQL shell
 dbshell:
 	vagrant ssh -c 'sudo docker exec -it koji-db psql koji -U koji'
+
+# login to a specified Docker container
+enter: container ?= koji-hub
+enter:
+	echo "Logging in to '$(container)'"
+	vagrant ssh -c 'sudo docker exec -it $(container) /bin/bash'
+
+# Dump the database to a local file
+dbdump:
+	dumpfile=`mktemp $(DBDUMP_TEMPLATE)` ;\
+	vagrant ssh -c 'sudo docker exec -it koji-db pg_dump koji -U koji' \
+		> $$dumpfile ;\
+	echo $$dumpfile

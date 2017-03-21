@@ -180,25 +180,60 @@ kojitest maven-build build-target https://www.github.com/myorg/myproject
 
 ## Vagrant wrapper for koji-dojo
 
-You can install Koji-Dojo inside a Vagrant VM.
+The `./Vagrantfile` enables you to install and run Koji-Dojo inside a Vagrant VM.
 
 The pre-requisite is Vagrant with libvirt provider installed on the workstation.
 
-```
-# First-time execution
-vagrant up
-# - which will provision both the Vagrant VM and koji-dojo Docker containers inside it
+### Usage example
 
-vagrant ssh -c 'sudo make -C /vagrant run' # will start the Docker containers and leave koji-builder running interactively
+~~~~
+# Provision both the Vagrant VM and koji-dojo Docker containers inside it
+$ vagrant up
 
-# ...and while it's running, in a separate console
-vagrant ssh -c 'sudo make -C /vagrant sources rpm-scratch-build'
-# - which will apply a patch to Koji which makes 'import-comps' command work, and then run a demo Koji task
+# Run a sample Koji build
+$ make demo-build
 
-# Map Koji UI host/port to the Vagrant host VM. This makes Koji UI available on http://localhost:4433/koji
-ssh localhost -L*:4433:172.17.0.3:443
+# Review build results
+$ vagrant ssh -c 'tree /opt/koji-files/scratch'
+/opt/koji-files/scratch
+└── kojiadmin
+    └── task_3
+        ├── koji-1.11.0-5.fc25.noarch.rpm
+        ├── koji-1.11.0-5.fc25.src.rpm
+        ├── koji-builder-1.11.0-5.fc25.noarch.rpm
+        ├── koji-hub-1.11.0-5.fc25.noarch.rpm
+        ├── koji-hub-plugins-1.11.0-5.fc25.noarch.rpm
+        ├── koji-utils-1.11.0-5.fc25.noarch.rpm
+        ├── koji-vm-1.11.0-5.fc25.noarch.rpm
+        ├── koji-web-1.11.0-5.fc25.noarch.rpm
+        └── logs
+            └── noarch
+                ├── build.log
+                ├── mock_output.log
+                ├── root.log
+                └── state.log
+
 
 # Drop the Vagrant VM to try again:
-vagrant destroy -f && vagrant up
-# ... and continue from the beginning
-```
+$ vagrant destroy -f && vagrant up && make demo-build
+
+~~~~
+
+### How to access Koji Web
+
+Use SSH port forwarding to get access to Koji web that is running in Vagrant guest VM. 
+
+`vagrant ssh -c 'ssh localhost -L*:4433:172.17.0.3:443'`
+
+- this makes Koji UI available on http://localhost:4433/koji
+
+### How to login to a Docker container
+
+~~~~
+# login to the builder container
+make enter container=koji-builder
+
+# login to the hub (by default)
+make enter
+
+~~~~
