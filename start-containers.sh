@@ -8,8 +8,7 @@ systemctl enable docker
 systemctl start docker
 
 # Allow Koji to use Fedora repos
-sed -i 's|^allowed_scms.*|allowed_scms=src.fedoraproject.org:/*:no  \
-    pkgs.fedoraproject.org:/*:no:fedpkg,sources|' \
+sed -i 's|^allowed_scms.*|allowed_scms=src.fedoraproject.org:/*:no pkgs.fedoraproject.org:/*:no:fedpkg,sources|' \
     /vagrant/builder/bin/entrypoint.sh
 
 mkdir -p /opt/koji-files
