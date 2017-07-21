@@ -24,6 +24,13 @@ RUN yum -y update && \
         python-simplejson \
         PyGreSQL \
         pyOpenSSL \
+        python-backports \
+        python-backports-ssl_match_hostname \
+        python-cheetah \
+        python-coverage \
+        python-dateutil \
+        python-devel \
+        python-kerberos \
         python-krbV \
         python-qpid \
         python-saslwrapper \
