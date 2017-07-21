@@ -61,7 +61,7 @@ else:
   output = ''
 
   sys.stderr.write("Executing temp script: %s" % script.name)
-  process = subprocess.Popen(['/usr/bin/sudo', '/bin/sh', script.name], stdout=subprocess.PIPE, shell=False)
+  process = subprocess.Popen(['/usr/bin/sudo', '/bin/sh', script.name, '2>&1'], stdout=subprocess.PIPE, shell=False)
   output, _err = process.communicate()
 
   retcode = process.poll()

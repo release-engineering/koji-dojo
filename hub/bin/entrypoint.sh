@@ -8,8 +8,8 @@ if grep -q -v "koji-db" /etc/hosts; then
     echo ${KOJI_DB_IP} koji-db >> /etc/hosts
 fi
 
-build-koji.sh
-setup.sh
+build-koji.sh || exit 1
+setup.sh || exit 2
 
 IP=$(find-ip.py)
 
