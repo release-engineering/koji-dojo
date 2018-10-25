@@ -21,7 +21,7 @@ done
 set -x
 
 if [ -d /opt/koji/noarch ]; then
-	yum -y localinstall /opt/koji/noarch/koji-1*.rpm
+	yum -y localinstall /opt/koji/noarch/koji-1*.rpm /opt/koji/noarch/python2-koji-1*
 else
 	echo "No koji RPM to install! Installing from EPEL"
 	#already in docker file
